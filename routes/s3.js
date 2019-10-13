@@ -35,18 +35,18 @@ router.get('/file', function (req, res, next)
 		}
 		else
 		{
-			res.set({ "Content-Disposition": `attachment; filename=${filename}` });
+			res.set({ "Content-Disposition": `attachment filename=${filename}` })
 			res.send(data.Body)
 		}
 	})
-});
+})
 
 
 router.get('/fileList', function(req, res, next)
 {
 	let files = []
 	s3Instance = createS3Instance(req.headers)
-	s3Instance.listObjectsV2({ Prefix: 'static', Delimiter: '/' }, function(err, data)
+	s3Instance.listObjectsV2({  }, function(err, data)
 	{
 		if (err)
 		{
@@ -69,4 +69,4 @@ router.get('/fileList', function(req, res, next)
 	})
 })
 
-module.exports = router;
+module.exports = router
