@@ -1,10 +1,14 @@
-var express = require('express')
-var router = express.Router()
-var AWS = require('aws-sdk')
+let router = require('express').Router()
+let AWS = require('aws-sdk')
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-	let { accesskeyid, secretaccesskey, bucket, key } = req.headers
+function createS3Instance(headers)
+{
+	let { accesskeyid, secretaccesskey, bucket, key } = headers
+
+	if (accesskeyid === '' || secretaccesskey === '' || bucket === '' || key === '') {
+		res.status(400)
+		res.send('missing header param')
+	}
 
 	let config = {
 		'accessKeyId': accesskeyid
@@ -13,17 +17,56 @@ router.get('/', function (req, res, next) {
 	AWS.config.update(config)
 
 
-	let params = {Bucket: bucket, Key: key}
-	let s3Instance = new AWS.S3({ maxRetries: 1 })
+	let params = { Bucket: bucket}
+	return new AWS.S3({ maxRetries: 1, params: params })
+}
 
-	s3Instance.getObject(params, function(err, data)  {
-		if(err) console.log(err, err.stack); // an error occurred
-		else console.log(data.Body.toString());           // successful response
+
+router.get('/file', function (req, res, next)
+{
+	let filename = req.headers.key
+	s3Instance = createS3Instance(req.headers)
+	s3Instance.getObject({ Key: filename }, function(err, data)  {
+		if(err)
+		{
+			console.log(err, err.stack)
+			res.status(404)
+			res.send('unable to find resource')
+		}
+		else
+		{
+			res.set({ "Content-Disposition": `attachment; filename=${filename}` });
+			res.send(data.Body)
+		}
 	})
-
-
-	//res.status('500')
-	res.send()
 });
+
+
+router.get('/fileList', function(req, res, next)
+{
+	let files = []
+	s3Instance = createS3Instance(req.headers)
+	s3Instance.listObjectsV2({ Prefix: 'static', Delimiter: '/' }, function(err, data)
+	{
+		if (err)
+		{
+			console.log(err, err.stack)
+		}
+		else
+		{
+			console.log(data.Contents)
+			for (content of data.Contents)
+			{
+				let file = {}
+				file.name = content.Key
+				file.lastModified = content.LastModified
+				file.size = content.Size
+				files.push(file)
+			}
+			res.send(files)
+		}
+
+	})
+})
 
 module.exports = router;
