@@ -1,10 +1,28 @@
-var createError = require('http-errors')
-var express = require('express')
-var path = require('path')
-var cookieParser = require('cookie-parser')
-var logger = require('morgan')
+let express = require('express')
+let path = require('path')
+let cookieParser = require('cookie-parser')
+let logger = require('morgan')
+let fs = require('fs')
+let https = require('https')
+let http = require('http');
 
-var app = express()
+let app = express()
+
+let options = {
+	key: fs.readFileSync(__dirname + '/certs/aws_server.key', 'utf8'),
+	cert: fs.readFileSync(__dirname + '/certs/aws_server.crt', 'utf8')
+}
+
+
+app.use(function (req, res, next) {
+	if (!req.secure)
+	{
+		let redirect = 'https://' + req.headers.host + req.url
+		console.log('making connection secure - redirecting')
+		res.redirect(redirect)
+	}
+	next()
+});
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -12,13 +30,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-function allowCors(req, res, next)
+app.use(allowCors = (req, res, next) =>
 {
 	res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, accesskeyid, secretaccesskey, bucket, key");
 	next();
-}
-app.use(allowCors);
+});
 
 app.use((req, res, next) => {
 	res.header('Content-Type', 'application/json')
@@ -45,7 +62,7 @@ app.use(function (err, req, res, next) {
 })
 
 
-app.set('port', 9999);
-app.listen(app.get('port'))
+https.createServer(options, app).listen(443);
+http.createServer(app).listen(80);
 
 module.exports = app
