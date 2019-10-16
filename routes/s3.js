@@ -1,16 +1,26 @@
 let router = require('express').Router()
 let AWS = require('aws-sdk')
 
-function createS3Instance(headers)
+function createS3Instance(headers, res)
 {
 	let { accesskeyid, secretaccesskey, bucket, key } = headers
 
-	if (accesskeyid === '' || secretaccesskey === '' || bucket === '' || key === '') {
+	if (accesskeyid === '' || secretaccesskey === '' || bucket === '' || key === '')
+	{
 		res.status(400)
 		res.send('missing header param')
 	}
 
-	let config = {
+	if (accesskeyid == null || secretaccesskey == null || bucket == null || key == null)
+	{
+		console.log('hi')
+		res.status(400)
+		res.send('missing header param')
+	}
+
+
+	let config =
+	{
 		'accessKeyId': accesskeyid
 		, 'secretAccessKey': secretaccesskey
 	}
@@ -26,7 +36,8 @@ router.get('/file', function (req, res, next)
 {
 	let filename = req.headers.key
 	s3Instance = createS3Instance(req.headers)
-	s3Instance.getObject({ Key: filename }, function(err, data)  {
+	s3Instance.getObject({ Key: filename }, function(err, data)
+	{
 		if(err)
 		{
 			console.log(err, err.stack)
@@ -45,7 +56,7 @@ router.get('/file', function (req, res, next)
 router.get('/fileList', function(req, res, next)
 {
 	let files = []
-	s3Instance = createS3Instance(req.headers)
+	s3Instance = createS3Instance(req.headers, res)
 	s3Instance.listObjectsV2({  }, function(err, data)
 	{
 		if (err)
