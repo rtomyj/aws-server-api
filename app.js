@@ -16,12 +16,10 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 
+httpConfig(app)
 
-app.use((req, res, next) =>
-{
-	res.header('Content-Type', 'application/json')
-	next()
-})
+corsConfig(app)
+
 
 app.use('/testcall', require('./routes/testcall'))
 app.use('/s3', require('./routes/s3'))
@@ -33,6 +31,7 @@ app.use(function (req, res, next)
 	res.send('invalid endpoint')
 })
 
+
 // error handler
 app.use(function (err, req, res, next)
 {
@@ -43,9 +42,5 @@ app.use(function (err, req, res, next)
 	// render the error page
 	res.status(err.status || 500)
 })
-
-
-corsConfig(app)
-httpConfig(app)
 
 module.exports = app

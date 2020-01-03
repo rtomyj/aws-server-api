@@ -65,7 +65,7 @@ router.get('/fileList', function(req, res, next)
 		}
 		else
 		{
-			console.log(data.Contents)
+			//console.log(data.Contents)
 			for (content of data.Contents)
 			{
 				let file = {}
