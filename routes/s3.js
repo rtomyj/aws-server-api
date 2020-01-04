@@ -4,18 +4,18 @@ let AWS = require('aws-sdk')
 function createS3Instance(headers, res)
 {
 	let { accesskeyid, secretaccesskey, bucket, key } = headers
+	console.log(headers)
 
 	if (accesskeyid === '' || secretaccesskey === '' || bucket === '' || key === '')
 	{
 		res.status(400)
-		res.send('missing header param')
+		res.send('required params are empty')
 	}
 
 	if (accesskeyid == null || secretaccesskey == null || bucket == null || key == null)
 	{
-		console.log('hi')
 		res.status(400)
-		res.send('missing header param')
+		res.send('required params are null')
 	}
 
 
@@ -27,12 +27,12 @@ function createS3Instance(headers, res)
 	AWS.config.update(config)
 
 
-	let params = { Bucket: bucket}
+	let params = { Bucket: bucket }
 	return new AWS.S3({ maxRetries: 1, params: params })
 }
 
 
-router.get('/file', function (req, res, next)
+router.get('/file', function (req, res)
 {
 	let filename = req.headers.key
 	s3Instance = createS3Instance(req.headers)
@@ -53,11 +53,11 @@ router.get('/file', function (req, res, next)
 })
 
 
-router.get('/fileList', function(req, res, next)
+router.get('/fileList', function(req, res)
 {
 	let files = []
 	s3Instance = createS3Instance(req.headers, res)
-	s3Instance.listObjectsV2({  }, function(err, data)
+	s3Instance.listObjectsV2({ Delimiter: '/', Prefix: '' }, function(err, data)
 	{
 		if (err)
 		{
@@ -65,16 +65,30 @@ router.get('/fileList', function(req, res, next)
 		}
 		else
 		{
-			//console.log(data.Contents)
-			for (content of data.Contents)
+			const contents = { files: [], folders: [] }
+
+			const files = data.Contents
+			for (file of files)
 			{
-				let file = {}
-				file.name = content.Key
-				file.lastModified = content.LastModified
-				file.size = content.Size
-				files.push(file)
+				let content = {}
+				content.name = file.Key
+				content.lastModified = file.LastModified
+				content.size = file.Size
+
+				contents.files.push(content)
 			}
-			res.send(files)
+
+			const folders = data.CommonPrefixes
+			for (folder of folders)
+			{
+				let content = {}
+				content.name = folder.Prefix
+
+				contents.folders.push(content)
+			}
+
+
+			res.send(contents)
 		}
 
 	})
