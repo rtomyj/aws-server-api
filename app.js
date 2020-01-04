@@ -1,24 +1,29 @@
-let express = require('express')
-let path = require('path')
-let cookieParser = require('cookie-parser')
-let logger = require('morgan')
+const express = require('express')
+const app = express()
 
-let httpConfig = require('./app.http')
-let corsConfig = require('./app.cors')
+const cors = require('cors')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
 
-let app = express()
+const handleRedirect = require('./app.http').handleRedirect
+const configureServer = require('./app.http').configureServer
+
 require('dotenv').config()
 
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(express.static(path.join(__dirname, 'public')))
 
+/*
+	handles pre-flight
+	server will return the allowed CORS functionality and stop processing the rest of the request, ie prevents error due to redirects in pre-flight
+	Should be one of the first middleware added.
+*/
+app.options( '*', cors() )
+app.use( cors() )	// opens up all CORS settings to clients
 
-httpConfig(app)
-
-corsConfig(app)
+handleRedirect(app)
 
 
 app.use('/testcall', require('./routes/testcall'))
@@ -28,7 +33,7 @@ app.use('/s3', require('./routes/s3'))
 app.use(function (req, res, next)
 {
 	res.status(404)
-	res.send('invalid endpoint')
+	res.send('endpoint does not exist')
 })
 
 
@@ -41,6 +46,12 @@ app.use(function (err, req, res, next)
 
 	// render the error page
 	res.status(err.status || 500)
+	console.log(err)
+
+	res.send('err')
 })
+
+
+configureServer(app)
 
 module.exports = app
