@@ -4,7 +4,7 @@ const createS3Instance = require('./config')
 
 router.get('/fileList', (req, res) =>
 {
-	s3Instance = createS3Instance(req.headers, res)
+	s3Instance = createS3Instance(req.headers, { Bucket: req.headers.bucket } )
 	s3Instance.listObjectsV2({ Delimiter: '/', Prefix: '' }, function(err, data)
 
 	{
