@@ -27,7 +27,8 @@ handleRedirect(app)
 
 
 app.use('/testcall', require('./routes/testcall'))
-app.use('/s3', require('./routes/s3'))
+app.use('/s3', require('./routes/s3/filelist'))
+app.use('/s3', require('./routes/s3/file'))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next)
