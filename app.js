@@ -8,6 +8,8 @@ const logger = require('morgan')
 const handleRedirect = require('./app.http').handleRedirect
 const configureServer = require('./app.http').configureServer
 
+
+
 require('dotenv').config()
 
 app.use(logger('dev'))
