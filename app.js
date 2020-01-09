@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
+const bodyParser = require('body-parser')
 
 const handleRedirect = require('./app.http').handleRedirect
 const configureServer = require('./app.http').configureServer
@@ -13,8 +14,8 @@ const configureServer = require('./app.http').configureServer
 require('dotenv').config()
 
 app.use(logger('dev'))
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded( { extended: true } ))
+app.use(bodyParser.json())
 app.use(cookieParser())
 
 /*
