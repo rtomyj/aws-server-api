@@ -6,8 +6,7 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const bodyParser = require('body-parser')
 
-const handleRedirect = require('./app.http').handleRedirect
-const configureServer = require('./app.http').configureServer
+const { handleRedirect, configureServer } = require('./app.http')
 
 
 
