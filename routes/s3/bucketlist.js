@@ -2,8 +2,9 @@ const router = require('express').Router()
 const { createS3Instance, cleanup } = require('./config')
 
 
-router.get('/bucketList', ( req, res ) => {
+router.post('/bucketList', ( req, res ) => {
 	const creds = req.body
+	console.log(creds)
 
 	const awsConn = createS3Instance( creds, {} )
 	awsConn.listBuckets( {}, ( err, data ) => {
