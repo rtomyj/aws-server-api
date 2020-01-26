@@ -19,7 +19,7 @@ const handleRedirect = ( app ) =>
 			const redirect = `https://${req.headers.host}:${HTTPS_PORT}${req.url}`
 			console.log( `User requested an unsecured resource - redirecting to: ${redirect}` )
 
-			res.redirect( redirect )
+			res.redirect( 307, redirect )	// 307 = redirect but current url is still valid
 		}
 		else	next()
 	})
