@@ -29,7 +29,7 @@ handleRedirect(app)
 
 
 app.use('/testcall', require('./routes/testcall'))
-app.use('/s3', require('./routes/s3/filelist'))
+app.use('/s3', require('./routes/s3/content'))
 app.use('/s3', require('./routes/s3/bucketlist'))
 app.use('/s3', require('./routes/s3/file'))
 

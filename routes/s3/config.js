@@ -9,7 +9,6 @@ const createS3Instance = (creds, s3Params) =>
 		credentials: new AWS.Credentials(accessKeyId, secretAccessKey),
 		endpoint: endpoint
 	} )
-	console.log(AWS.config.credentials)
 
 	return new AWS.S3({ maxRetries: 1, params: s3Params })
 }
@@ -19,8 +18,6 @@ const cleanup = () => {
 		credentials: new AWS.Credentials( undefined, undefined ),
 		endpoint: undefined
 	} )
-
-	console.log(AWS.config.credentials)
 }
 
 
