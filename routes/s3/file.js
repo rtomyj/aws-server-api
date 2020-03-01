@@ -2,7 +2,7 @@ const router = require('express').Router()
 const createS3Instance = require('./config')
 
 
-router.get('/file', (req, res) =>
+router.post('/bucket/file', (req, res) =>
 {
 	let filename = req.headers.key
 	s3Instance = createS3Instance(req.headers)

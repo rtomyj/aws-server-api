@@ -8,6 +8,11 @@ const bodyParser = require('body-parser')
 
 const { handleRedirect, configureServer } = require('./app.http')
 
+const baseApiUri = '/api/v1'
+const baseS3Uri = `${baseApiUri}/s3`
+const baseRouterPath = './routes'
+const baseS3RouterPath = `${baseRouterPath}/s3`
+
 
 
 require('dotenv').config()
@@ -28,10 +33,10 @@ app.use( cors() )	// opens up all CORS settings to clients
 handleRedirect(app)
 
 
-app.use('/testcall', require('./routes/testcall'))
-app.use('/s3', require('./routes/s3/content'))
-app.use('/s3', require('./routes/s3/bucketlist'))
-app.use('/s3', require('./routes/s3/file'))
+app.use(`${baseApiUri}/testcall`, require(`${baseRouterPath}/testcall`))
+app.use(baseS3Uri, require(`${baseS3RouterPath}/content`))
+app.use(baseS3Uri, require(`${baseS3RouterPath}/bucket`))
+app.use(baseS3Uri, require(`${baseS3RouterPath}/file`))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next)

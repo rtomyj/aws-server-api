@@ -1,4 +1,4 @@
-let router = require('express').Router()
+const router = require('express').Router()
 const { createS3Instance } = require('./config')
 
 
